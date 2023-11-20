@@ -1,0 +1,73 @@
+﻿@model IEnumerable<Evaluation.Domain.Entities.Vehicle>
+
+
+@{
+}
+
+
+@if (Model is not null && Model.Count() > 0)
+{
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.VehicleId)
+            </td>
+            <td>
+                @if (item.Active)
+                {
+                    <span>Yes</span>
+                }
+                else
+                {
+                    <span>no</span>
+                }
+
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.RegNo)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Make)
+            </td>
+
+            <td>
+                @Html.DisplayFor(modelItem => item.Model)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Color)
+
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.EngineNo)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ChasisNo)
+            </td>
+            <td>
+                @item.DateOfPurchase.ToString("dd/MM/yyyy")
+            </td>
+            <td>
+                <form asp-page="Index" asp-page-handler="Delete" onsubmit="return Delete(this)" >
+                    @Html.AntiForgeryToken()
+                    <div class="btn-group user-icons" role="group">
+                        <input id="id" name="id" value="@item.VehicleId" type="hidden"/>
+                        <a href="/Index?id=@item.VehicleId" class="btn green"><img src="~/Images/edit.png" class="png-icons" /></a>
+                        <button type="submit" value="Delete" class="btn red"><img src="~/Images/delete.png" class="png-icons" /> </button>
+                    </div>
+                </form>
+                
+            </td>
+        </tr>
+    }
+}
+
+else
+{
+    <tr>
+        <td colspan="10"> No data</td>
+    </tr>
+}
+
+
+

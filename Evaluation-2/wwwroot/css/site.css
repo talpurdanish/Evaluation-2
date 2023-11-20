@@ -1,0 +1,107 @@
+.user-icons img.png-icons {
+    width: 20px !important;
+    height: 20px !important;
+}
+
+
+.red, .red:hover,
+.green, .green:hover,
+.blue, .blue:hover,
+.gray, .gray:hover,
+.orange, .orange:hover,
+.red i, .red:hover i,
+.green i, .green:hover i,
+.blue i, .blue:hover i,
+.gray i, .gray:hover i,
+.orange i, .orange:hover i {
+    color: white;
+    font-weight: bold;
+}
+
+.red {
+    background: rgb(194,3,3);
+    background: -moz-linear-gradient(0deg, rgba(194,3,3,1) 0%, rgba(134,0,0,1) 100%);
+    background: -webkit-linear-gradient(0deg, rgba(194,3,3,1) 0%, rgba(134,0,0,1) 100%);
+    background: linear-gradient(0deg, rgba(194,3,3,1) 0%, rgba(134,0,0,1) 100%);
+    
+    border: 1px solid #860000;
+}
+
+    .red:hover {
+        background: rgb(194,3,3);
+        background: -moz-linear-gradient(0deg, rgba(194,3,3,1) 0%, rgba(194,3,3,1) 100%);
+        background: -webkit-linear-gradient(0deg, rgba(194,3,3,1) 0%, rgba(194,3,3,1) 100%);
+        background: linear-gradient(0deg, rgba(194,3,3,1) 0%, rgba(194,3,3,1) 100%);
+        border: 1px solid #860000;
+    }
+
+.green {
+    background: rgb(31,194,2);
+    background: -moz-linear-gradient(0deg, rgba(31,194,2,1) 0%, rgba(24,97,1,1) 100%);
+    background: -webkit-linear-gradient(0deg, rgba(31,194,2,1) 0%, rgba(24,97,1,1) 100%);
+    background: linear-gradient(0deg, rgba(31,194,2,1) 0%, rgba(24,97,1,1) 100%);
+    border: 1px solid #186101;
+}
+
+    .green:hover {
+        background: rgb(31,194,2);
+        background: -moz-linear-gradient(0deg, rgba(31,194,2,1) 0%, rgba(31,194,2,1) 100%);
+        background: -webkit-linear-gradient(0deg, rgba(31,194,2,1) 0%, rgba(31,194,2,1) 100%);
+        background: linear-gradient(0deg, rgba(31,194,2,1) 0%, rgba(31,194,2,1) 100%);
+        border: 1px solid #186101;
+    }
+
+.blue {
+    background: rgb(0,35,255);
+    background: -moz-linear-gradient(0deg, rgba(0,35,255,1) 0%, rgba(1,27,97,1) 100%);
+    background: -webkit-linear-gradient(0deg, rgba(0,35,255,1) 0%, rgba(1,27,97,1) 100%);
+    background: linear-gradient(0deg, rgba(0,35,255,1) 0%, rgba(1,27,97,1) 100%);
+    border: 1px solid #011b61;
+}
+
+    .blue:hover {
+        background: rgb(0,35,255);
+        background: -moz-linear-gradient(0deg, rgba(0,35,255,1) 0%, rgba(0,35,255,1) 100%);
+        background: -webkit-linear-gradient(0deg, rgba(0,35,255,1) 0%, rgba(0,35,255,1) 100%);
+        background: linear-gradient(0deg, rgba(0,35,255,1) 0%, rgba(0,35,255,1) 100%);
+        border: 1px solid #011b61;
+    }
+
+.gray {
+    background: rgb(100,100,100);
+    background: -moz-linear-gradient(0deg, rgba(100,100,100,1) 0%, rgba(0,0,0,1) 100%);
+    background: -webkit-linear-gradient(0deg, rgba(100,100,100,1) 0%, rgba(0,0,0,1) 100%);
+    background: linear-gradient(0deg, rgba(100,100,100,1) 0%, rgba(0,0,0,1) 100%);
+    border: 1px solid #000000;
+}
+
+    .gray:hover {
+        background: rgb(100,100,100);
+        background: -moz-linear-gradient(0deg, rgba(100,100,100,1) 0%, rgba(100,100,100,1) 100%);
+        background: -webkit-linear-gradient(0deg, rgba(100,100,100,1) 0%, rgba(100,100,100,1) 100%);
+        background: linear-gradient(0deg, rgba(100,100,100,1) 0%, rgba(100,100,100,1) 100%);
+        border: 1px solid #000000;
+    }
+
+
+
+.orange {
+    background: rgb(107,109,0);
+    background: -moz-linear-gradient(180deg, rgba(107,109,0,1) 0%, rgba(249,255,0,1) 100%);
+    background: -webkit-linear-gradient(180deg, rgba(107,109,0,1) 0%, rgba(249,255,0,1) 100%);
+    background: linear-gradient(180deg, rgba(107,109,0,1) 0%, rgba(249,255,0,1) 100%);
+    border: 1px solid #6b6d00;
+}
+
+    .orange:hover {
+        background: rgb(249,255,0);
+        background: -moz-linear-gradient(0deg, rgba(249,255,0,1) 0%, rgba(249,255,0,1) 100%);
+        background: -webkit-linear-gradient(0deg, rgba(249,255,0,1) 0%, rgba(249,255,0,1) 100%);
+        background: linear-gradient(0deg, rgba(249,255,0,1) 0%, rgba(249,255,0,1) 100%);
+        color: #000;
+        border: 1px solid #6b6d00;
+    }
+
+        .orange i, .orange:hover i {
+            color: #000;
+        }

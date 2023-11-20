@@ -1,0 +1,591 @@
+﻿@page "{searchString?}/{sort?}/{direction?}/{searchbyid = false}/{searchbydate = false}/{startdate?}/{enddate?}/{id?}/{currentpage?}"
+@model Evaluation.Pages.IndexModel
+@inject Evaluation.Repositories.IVehicleRepository repository
+
+@{
+    ViewData["Title"] = "HomePage";
+    var dop = Model.Vehicle.DateOfPurchase.ToString("dd-MM-yyyy") ?? DateTime.Now.ToString("dd-MM-yyyy");
+
+}
+
+@if (Model.ShowMessage)
+{
+
+    <div class="alert alert-danger alert-dismissible" role="alert" id="SystemMessage"> @Model.Message</div>
+}
+
+<div class="alert alert-success alert-dismissible" role="alert" id="successAlert"> </div>
+<div class="alert alert-danger alert-dismissible" role="alert" id="errorAlert"></div>
+<div class="row mb-2">
+    <div class="col-lg-12 col-md-12 col-sm-12">
+        <h2>Create Vehicle</h2>
+
+        <form id="createVehicle" method="post" asp-page="Index" asp-page-handler="CreateOrEdit" onsubmit="return SubmitData(this);">
+            @* @Html.AntiForgeryToken() *@
+            <input type="hidden" asp-for="@Model.Vehicle.VehicleId" id="VehicleId" />
+            <div class="row">
+                <div class="col-lg-4 col-md-4 col-sm-12">
+                    <div class="form-group">
+                        <label asp-for="@Model.Vehicle.RegNo"></label>
+                        <input asp-for="@Model.Vehicle.RegNo" id="RegNo" class="form-control" />
+                        <span asp-validation-for="@Model.Vehicle.RegNo" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-12">
+                    <div class="form-group">
+                        <label asp-for="@Model.Vehicle.Make"></label>
+                        <input asp-for="@Model.Vehicle.Make" id="Make" class="form-control" />
+                        <span asp-validation-for="@Model.Vehicle.Make" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-4 col-sm-12">
+                    <div class="form-group">
+                        <label asp-for="@Model.Vehicle.Model"></label>
+                        <input asp-for="@Model.Vehicle.Model" id="Model" class="form-control" />
+                        <span asp-validation-for="@Model.Vehicle.Model" class="text-danger"></span>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="row">
+                <div class="col-lg-4 col-md-4 col-sm-12">
+                    <div class="form-group">
+                        <label asp-for="@Model.Vehicle.Color"></label>
+                        <input asp-for="@Model.Vehicle.Color" id="Color" class="form-control" />
+                        <span asp-validation-for="@Model.Vehicle.Color" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-12">
+                    <div class="form-group">
+                        <label asp-for="@Model.Vehicle.EngineNo"></label>
+                        <input asp-for="@Model.Vehicle.EngineNo" id="EngineNo" class="form-control" />
+                        <span asp-validation-for="@Model.Vehicle.EngineNo" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-4 col-sm-12">
+                    <div class="form-group">
+                        <label asp-for="@Model.Vehicle.ChasisNo"></label>
+                        <input asp-for="@Model.Vehicle.ChasisNo" id="ChasisNo" class="form-control" />
+                        <span asp-validation-for="@Model.Vehicle.ChasisNo" class="text-danger"></span>
+                    </div>
+                </div>
+
+            </div>
+            <div class="row">
+                <div class="col-lg-4 col-md-4 col-sm-12">
+                    <div class="form-group">
+                        <label asp-for="@Model.Vehicle.DateOfPurchase"></label>
+                        
+                        <input asp-for="@Model.Vehicle.DateOfPurchase" id="DateOfPurchase" asp-format="{0:dd-MM-yyyy}" class="form-control" />
+                        <span asp-validation-for="@Model.Vehicle.DateOfPurchase"  class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-12">
+                    <div class="form-group">
+                        <label asp-for="@Model.Vehicle.Active"></label>
+                        <div class="form-check">
+                            <input asp-for="@Model.Vehicle.Active" id="Active" class="form-check-input position-static" type="checkbox" />
+
+                        </div>
+
+
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-4 col-sm-12">
+                </div>
+
+            </div>
+
+            <div class="row">
+                <div class="col-lg-4 col-md-4 col-sm-12">
+                    <div class="btn-group">
+                        <input type="submit" value="Save" class="mx-10 btn btn-success" id="btnSave" />
+                        <input type="button" value="Reset" class="mx-10 btn btn-warning" id="reset" />
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-12">
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-12">
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<div class="row mb-2">
+    <div class="col-sm-12 p-3" id="MedicationsDataTable">
+        <h2>View Vehicles</h2>
+        <div class="row mt-1">
+            <div class="col-lg-12 col-md-12 col-sm-12">
+                <form onsubmit="return FilterData();">
+                    <div class="row">
+                        <div class="col-lg-3 col-md-3 col-sm-12">
+                            <input asp-for="SearchString" id="searchString" class="form-control" placeholder="Enter Search Query" />
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-12">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><input type="checkbox" id="checkId" /></span>
+                                </div>
+                                <input asp-for="@Model.Id" id="Id" class="form-control" placeholder="Enter Id" />
+                            </div>
+                        </div>
+                        <div class="col-lg-5 col-md-5 col-sm-12">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><input type="checkbox" id="checkDate" /></span>
+                                </div>
+                                <input placeholder="dd-MM-yyyy" id="StartDate" class="form-control" />
+                                <input placeholder="dd-MM-yyyy" id="EndDate" class="form-control" />
+                            </div>
+                        </div>
+                        <div class="col-lg-1 col-md-1 col-sm-12 m-0 p-0">
+                            <button class="btn btn-primary" type="button" onclick="return FilterData();">Search</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div id="viewAll" class="card-body table-responsive">
+            <input type="hidden" id="pageInput" value="1" />
+            <table class="table table-bordered table-responsive" id="vehiclesTable">
+                <thead class="thead-dark">
+
+                    <tr>
+                        <th>
+                            Id <a data-col="VehicleId" data-order="asc" onclick="return SortData('#idSorter');" id="idSorter"> <i class="fa fa-sort"></i></a>
+
+                        </th>
+                        <th>
+                            <i class="fa fa-check"></i> <a data-col="Active" data-order="asc" onclick="return SortData('#activeSorter');" id="activeSorter"> <i class="fa fa-sort"></i></a>
+                        </th>
+                        <th>
+                            Registration No <a data-col="RegNo" data-order="asc" onclick="return SortData('#regSorter');" id="regSorter"> <i class="fa fa-sort"></i></a>
+                        </th>
+                        <th>
+                            Make <a data-col="Make" data-order="asc" onclick="return SortData('#makeSorter');" id="makeSorter"> <i class="fa fa-sort"></i></a>
+                        </th>
+                        <th>
+                            Model  <a data-col="Model" data-order="asc" onclick="return SortData('#modelSorter');" id="modelSorter"> <i class="fa fa-sort"></i></a>
+                        </th>
+                        <th>
+                            Color <a data-col="Color" data-order="asc" onclick="return SortData('#colorSorter');" id="colorSorter"> <i class="fa fa-sort"></i></a>
+                        </th>
+                        <th>
+                            Engine No <a data-col="EngineNo" data-order="asc" onclick="return SortData('#engineSorter');" id="engineSorter"> <i class="fa fa-sort"></i></a>
+                        </th>
+                        <th>
+                            Chassis No <a data-col="ChasisNo" data-order="asc" onclick="return SortData('#chasisSorter');" id="chasisSorter"> <i class="fa fa-sort"></i></a>
+                        </th>
+                        <th>
+                            Date Of Purchase <a data-col="DateOfPurchase" data-order="asc" onclick="return SortData('#dateSorter');" id="dateSorter"> <i class="fa fa-sort"></i></a>
+                        </th>
+
+                        <th>
+                            Actions
+                        </th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="10">
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+
+
+        </div>
+    </div>
+</div>
+
+
+@section Scripts{
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+
+
+        $(document).ready(function () {
+            $("#successAlert, #errorAlert").hide();
+            $('#StartDate').attr('disabled', 'disabled');
+            $('#EndDate').attr('disabled', 'disabled');
+            $('#Id').attr('disabled', 'disabled');
+
+
+            var date = "@dop";
+            $("#DateOfPurchase")
+                .datepicker({
+                    defaultDate: "+1w",
+                    changeMonth: true,
+                    numberOfMonths: 1,
+                    maxDate: new Date(),
+                    dateFormat: "dd-mm-yy",
+                    changeYear: true,
+                    setDate:date
+                })
+
+            $("#SystemMessage").ready(function () {
+                setTimeout(function () {
+                    $('#SystemMessage').fadeOut('fast');
+                }, 3000);
+
+            });
+           
+            $("#successAlert").on('fadeIn', function () {
+                setTimeout(function () {
+                    $('#successAlert').fadeOut('fast');
+                }, 1000);
+
+            });
+
+            $("#errorAlert").on('fadeIn', function () {
+                setTimeout(function () {
+                    $('#errorAlert').fadeOut('fast');
+                }, 1000);
+
+            });
+
+            FilterData("", "");
+
+            $.validator.unobtrusive.parse(document);
+            $(function () {
+                $('#reload').on('click', function () {
+                    LoadTable("", "", "");
+                });
+            });
+
+            $(function () {
+                $('#reset').on('click', function () {
+                    ResetForm();
+                });
+            });
+            $(function () {
+                $('#checkId').click(function () {
+                    if ($(this).is(':checked')) {
+                        $('#Id').removeAttr('disabled');
+
+                    } else {
+                        $('#Id').attr('disabled', 'disabled');
+
+                    }
+                });
+            });
+            $(function () {
+                $('#checkDate').click(function () {
+                    if ($(this).is(':checked')) {
+
+                        $('#StartDate').removeAttr('disabled');
+                        $('#EndDate').removeAttr('disabled');
+
+                    } else {
+                        $('#StartDate').attr('disabled', 'disabled');
+                        $('#EndDate').attr('disabled', 'disabled');
+                    }
+                });
+            });
+
+
+
+
+            $(function () {
+                var currentDate = new Date();
+                var dateFormat = "dd-mm-yy",
+                    from = $("#StartDate")
+                        .datepicker({
+                            defaultDate: "+1w",
+                            changeMonth: true,
+                            numberOfMonths: 1,
+                            maxDate: currentDate,
+                            dateFormat: dateFormat,
+                            changeYear: true
+                        })
+                        .on("change", function () {
+
+                            to.datepicker("option", "minDate", getDate(this));
+                        }),
+                    to = $("#EndDate").datepicker({
+                        defaultDate: "+1w",
+                        changeMonth: true,
+                        numberOfMonths: 1,
+                        maxDate: currentDate,
+                        dateFormat: dateFormat,
+                        changeYear: true
+                    })
+                        .on("change", function () {
+
+                            from.datepicker("option", "maxDate", getDate(this));
+                        });
+
+                function getDate(element) {
+                    var date;
+                    try {
+                        date = $.datepicker.parseDate(dateFormat, element.value);
+                    } catch (error) {
+                        date = null;
+                    }
+
+                    return date;
+                }
+
+            });
+
+
+
+        });
+
+        function loadPage(link) {
+
+            var page = $(link).data('page');
+            var totalPages = $(link).data('total');
+
+            if (page > 1) {
+                $("#Previous").data("page", page - 1).removeAttr('disabled');
+            }
+            else {
+                $('#Previous').attr('disabled', 'disabled');
+            }
+
+            if (page < totalPages) {
+                $("#Next").data("page", page + 1).removeAttr('disabled');
+            }
+            else {
+                $('#Next').attr('disabled', 'disabled');
+
+            }
+
+            $("#pageInput").val(page);
+
+            FilterData("", "");
+            return false;
+        }
+
+        function LoadTable(searchString, sort, direction, searchById, searchByDate, id, startdate, enddate, page) {
+
+            $('#viewAll table tbody').load('?handler=ViewAllPartial&searchString=' + searchString
+                + "&sort=" + sort
+                + "&direction=" + direction
+                + "&searchbyid=" + searchById
+                + "&searchbydate=" + searchByDate
+                + "&id=" + id
+                + "&startdate=" + startdate
+                + "&enddate=" + enddate
+                + "&currentpage=" + page
+                , function () {
+                    GeneratePagination();
+                });
+
+
+        }
+
+        function FilterData(sort, order) {
+            var searchString = $("#searchString").val();
+
+            var startdate = $("#StartDate").val()
+            var enddate = $("#EndDate").val()
+            var id = $("#Id").val()
+
+            var searchById = $("#checkId").is(':checked');
+            var searchByDate = $("#checkDate").is(':checked');
+
+            var page = $("#pageInput").val()
+
+            if (page < 0)
+                page = 1;
+
+            LoadTable(searchString, sort, order, searchById, searchByDate, id, startdate, enddate, page);
+
+        }
+
+
+
+        function SortData(column) {
+            var sort = $(column).data("col");
+            var order = $(column).data("order");
+
+            FilterData(sort, order);
+
+            $(column).data("order", order == "asc" ? "desc" : "asc");
+        }
+
+        function ResetForm() {
+            $("#RegNo").val("");
+            $("#Make").val("");
+            $("#Model").val("");
+            $("#Color").val("");
+            $("#EngineNo").val("");
+            $("#ChasisNo").val("");
+            $("#DateOfPurchase").val("");
+            $("#Active").val("");
+            $("#VehicleId").val("");
+            $("#btnSave").val("Save");
+
+            $("#errorContainer").hide();
+            $(".form-control").removeClass("is-invalid");
+        }
+
+
+        function SubmitData(form) {
+
+            try {
+                $.ajax({
+                    type: 'POST',
+                    url: "\Index?handler=CreateOrEdit",
+                    data: new FormData(form),
+                    contentType: false,
+                    processData: false,
+                    success: function (res) {
+                        if (res.isValid) {
+                            showSuccessMessage("Record has been added");
+                            FilterData("", "");
+                            ResetForm();
+                        }
+                        else { showErrorMessage(res.message); }
+                    },
+                    error: function (err) {
+                        showErrorMessage("Record has not been added");
+                    }
+                });
+
+                return false;
+            } catch (ex) {
+                console.log(ex)
+            }
+        }
+
+
+        function ConfirmDialog(message, handler) {
+            $(`<div class="modal fade confirm-modal" id="ConfirmModal" role="dialog">
+                                                                <div class= "modal-dialog" role = "document" >
+                                                                    <div class="modal-content h-100">
+                                                                        <div class="modal-header">
+                                                                            <h5 class="modal-title">${message}</h5>
+                                                                        </div>
+                                                                        <div class="modal-footer align-self-center mx-auto">
+                                                                            <button type="button" class="btn green" id="btn-yes">Yes</button>
+                                                                            <button type="button" class="btn red"  id="btn-no" data-dismiss="modal">No</button>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                             </div>`).appendTo('body');
+
+
+            //Trigger the modal
+            $("#ConfirmModal").modal({
+                backdrop: 'static',
+                keyboard: false
+            }).modal("show");
+
+            //Pass true to a callback function
+            $("#btn-yes").click(function () {
+                handler(true);
+                $("#ConfirmModal").modal("hide");
+            });
+
+            //Pass false to callback function
+            $("#btn-no").click(function () {
+                handler(false);
+                $("#ConfirmModal").modal("hide");
+            });
+
+            //Remove the modal once it is closed.
+            $("#ConfirmModal").on('hidden.bs.modal', function () {
+                $("#ConfirmModal").remove();
+            });
+        }
+        function Delete(form) {
+            ConfirmDialog('Are you sure to delete this record ?', (ans) => {
+                if (ans) {
+                    try {
+                        $.ajax({
+                            type: 'POST',
+                            url: "\Index?handler=Delete",
+                            data: new FormData(form),
+                            contentType: false,
+                            processData: false,
+                            success: function (response) {
+                                if (response.isValid) {
+                                    showSuccessMessage("Record has been deleted");
+                                    FilterData("", "");
+                                }
+                                else {
+                                    showErrorMessage("Record has not been deleted");
+                                }
+                            },
+                            error: function (err) {
+                                console.log(err)
+                            }
+                        });
+                    } catch (ex) {
+                        console.log(ex)
+                    }
+                } else {
+                    console.log("no");
+                }
+            });
+            return false;
+        }
+
+
+        function showErrorMessage(message) {
+            $("#successAlert").hide();
+            $("#errorAlert").html(message).fadeIn();
+        }
+        function showSuccessMessage(message) {
+            $("#errorAlert").hide();
+            $("#successAlert").html(message).fadeIn();
+        }
+
+        function GeneratePagination() {
+
+            try {
+                $.ajax({
+                    type: 'Get',
+                    url: "\Index?handler=Count",
+
+                    success: function (res) {
+                        var currentpage = res.page;
+                        var totalpages = res.pages;
+
+                        if (res.page == 0)
+                            GeneratePagination();
+
+                        var prevDisabled = currentpage == 1 ? "disabled" : "";
+                        var nextDisabled = currentpage == totalpages ? "disabled" : "";
+                        var previous = currentpage - 1;
+                        var next = currentpage + 1;
+                        var liString = '';
+
+                        for (i = 1; i <= totalpages; i++) {
+                            var active = i == currentpage ? "btn-primary" : "btn-outline-primary";
+                            liString += '<button type = "button" id="Page' + i + '" class="btn ' + active + '" onclick="loadPage(\'#Page' + i + '\')" data-page="' + i + '" data-total="' + totalpages + '"> ' + i + '</button></li>';
+                        }
+                        var html = '<div class="btn-group">' +
+                            '<button  type = "button" ' + prevDisabled + ' class="btn btn-outline-primary" id="Previous"  tabindex = "-1"  onclick="loadPage(\'#Previous\')" data-page="' + previous + '"  data-total="' + totalpages + '"> Previous </button>' +
+                            liString +
+                            '<button  type = "button" ' + nextDisabled + ' class="btn btn-outline-primary"  id="Next"  data-page="' + next + '"  href="#" onclick="loadPage(\'#Next\')" data-total="' + totalpages + '"> Next </button>' +
+                            '</div>';
+                        $('#viewAll table tfoot tr td').html(html);
+
+                    },
+                    error: function (err) {
+                        console.log(err)
+                    }
+                });
+
+                return false;
+            } catch (ex) {
+                console.log(ex)
+            }
+
+        }
+
+    </script>
+    }

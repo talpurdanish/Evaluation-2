@@ -1,0 +1,205 @@
+﻿@page
+@model Evaluation.Pages.BulkModel
+@inject Evaluation.Repositories.IVehicleRepository repository
+
+@{
+    ViewData["Title"] = "Bulk Upload";
+
+    
+}
+
+
+<div class="alert alert-success alert-dismissible" role="alert" id="successAlert"> </div>
+<div class="alert alert-danger alert-dismissible" role="alert" id="errorAlert">
+    
+
+
+</div>
+<div class="row mb-2">
+    <div class="col-lg-12 col-md-12 col-sm-12">
+        <h2>Bulk Upload</h2>
+        <form enctype="multipart/form-data" method="post" asp-page="Bulk" asp-page-handler="Upload" onsubmit="return UploadFile(this);">
+            <div class="mb-3">
+                <label asp-for="@Model.UploadedExcelFile">Select File to Upload</label>
+                <input asp-for="@Model.UploadedExcelFile" id="Upload" type="file" name="Upload" class="form-control" />
+
+            </div>
+            <input class="btn btn-primary" type="submit" value="Upload" />
+        </form>
+    </div>
+</div>
+
+<div class="row mb-2" id="ViewData">
+    <div class="col-sm-12 p-3" id="MedicationsDataTable">
+        <h2>View Vehicles</h2>
+        <div id="viewAll" class="card-body table-responsive">
+            <table class="table table-bordered table-responsive table-striped table-hover datatable" id="vehiclesTable">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>
+                            <i class="fa fa-check"></i>
+                        </th>
+                        <th>
+                            Registration No
+                        </th>
+                        <th>
+                            Make
+                        </th>
+                        <th>
+                            Model
+                        </th>
+                        <th>
+                            Color
+                        </th>
+                        <th>
+                            Engine No
+                        </th>
+                        <th>
+                            Chassis No
+                        </th>
+                        <th>
+                            Date Of Purchase
+                        </th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+
+            <div class="alert alert-warning">
+                <form method="post" asp-page="Bulk" asp-page-handler="UploadToDatabase" onsubmit="return UploadToDatabase(this);">
+                    <p><input type="checkbox" id="checkOk" /> I have checked the records and these are valid for uploading to database</p>
+                    <button class="btn-primary btn" id="UploadDatabase" type="submit" disabled>Upload To Database</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts{
+
+
+    <script>
+        $(document).ready(function () {
+
+            $("#successAlert, #errorAlert").hide();
+            $('#ViewData').hide();
+           
+            $(function () {
+                $('#checkOk').click(function () {
+                    if ($(this).is(':checked')) {
+
+                        $('#UploadDatabase').removeAttr('disabled');
+
+
+                    } else {
+                        $('#UploadDatabase').attr('disabled', 'disabled');
+
+                    }
+                });
+            });
+        });
+
+        function UploadFile(form) {
+
+            var formdata = new FormData();
+            var files = $('#Upload')[0].files;
+            if (files.length > 0) {
+                formdata.append("Upload", files[0]);
+            }
+
+            $.ajax({
+                type: "POST",
+                url: form.action,
+                data: formdata,
+                cache: false,
+                contentType: false,
+                processData: false,
+                headers: {
+                    RequestVerificationToken:
+                        $('input:hidden[name="__RequestVerificationToken"]').val()
+                },
+                success: function (res) {
+                    if (res.isValid) {
+                        showSuccessMessage("File has been uploaded");
+                        $('#viewAll table tbody').html(res.html);
+                        $('#ViewData').show();
+                    }
+                    else {
+
+                        showErrorMessage(res.message);
+                    }
+                },
+                failure: function (response) {
+                    showErrorMessage("File has not been uploaded");
+                },
+                error: function (response) {
+                    showErrorMessage("File has not been uploaded");
+                }
+            });
+            return false;
+        }
+
+
+        function UploadToDatabase(form) {
+            $.ajax({
+                type: "POST",
+                url: form.action,
+                cache: false,
+                contentType: false,
+                processData: false,
+                headers: {
+                    RequestVerificationToken:
+                        $('input:hidden[name="__RequestVerificationToken"]').val()
+                },
+                success: function (res) {
+                    if (res.isValid) {
+                        showSuccessMessage("Data has been uploaded. Proceed to <a href='\Index' >Index</a> to view the changes, please");
+                        $('#ViewData').hide();
+                    }
+                    else {
+
+                        showErrorMessage(res.message);
+                    }
+
+                },
+                failure: function (response) {
+                    showErrorMessage("Data has not been uploaded");
+                },
+                error: function (response) {
+                    showErrorMessage("Data has not been uploaded");
+                }
+            });
+            return false;
+        }
+
+        function LoadTable() {
+            $('#viewAll table tbody').load('?handler=ViewAllPartial');
+            $('#ViewData').show();
+        }
+
+        function ResetForm() {
+            $("#RegNo").val("");
+            $("#Make").val("");
+            $("#Model").val("");
+            $("#Color").val("");
+            $("#EngineNo").val("");
+            $("#ChasisNo").val("");
+            $("#DateOfPurchase").val("");
+            $("#Active").val("");
+            $("#errorContainer").hide();
+            $(".form-control").removeClass("is-invalid");
+        }
+
+
+        function showErrorMessage(message) {
+            $("#successAlert").hide();
+            $("#errorAlert").html(message).fadeIn();
+        }
+        function showSuccessMessage(message) {
+            $("#errorAlert").hide();
+            $("#successAlert").html(message).fadeIn();
+        }
+
+    </script>
+    }
